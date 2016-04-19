@@ -82,10 +82,10 @@ for h in T:
                 myGames[a,h,s,w] = myModel.addVar(obj =1, vtype=GRB.BINARY, 
                                     name='games_%s_%s_%s_%s' % (a,h,s,w))
 
-for a in T:
+for h in T:
     for w in range(4,12):
-        myGames[a,'BYE','SUNB_NFL',w] = myModel.addVar(obj =1, vtype=GRB.BINARY, 
-                                        name='games_%s_%s_%s_%s' % (a,h,s,w))
+        myGames['BYE',h,'SUNB_NFL',w] = myModel.addVar(obj =1, vtype=GRB.BINARY, 
+                                        name='games_BYE_%s_%s_%s' % (h,s,w))
                                         
 myModel.update()                                        
 ########################################################################################################################
@@ -369,24 +369,33 @@ for h in T:
                 constrName='Home_Before_Int'
                 myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w-1] for a in H[h] for s in S[w])  == 1 , name=constrName)
                 myConstr[constrName]=myModel.addConstr(myGames[a,'JAC',s,3]  and myGames[a,'',s,3]  and myGames[a,h,s,w] == 3 , name=constrName)
+
 # THESE ARE THE INTERNATIONAL GAMES. HOME GAMES SHOULD BE THE WEEK BEFORE.
 # JAC vs IND Week 4
 # LAR vs NYG Week 7
 # CIN vs WAS Week 8
 # HOU vs. OAK week 11                
-constrName='Home_Before_Int_Week3' 
-myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'JAC',s,3] for a in H['JAC'] for s in S[3] == 1, name=constrName) 
-myConstr[constrName]=myModel.addConstr(myGames[a,'IND',s,3] ;
-constrName='Home_Before_Int_Week6'               
-                 myConstr[constrName]=myModel.addConstr(myGames[a,'LAR',s,6] ;
-                 myConstr[constrName]=myModel.addConstr(myGames[a,'NYG',s,6] ;
-constrName='Home_Before_Int_Week7' 
-                 myConstr[constrName]=myModel.addConstr(myGames[a,'CIN',s,7] ;
-                 myConstr[constrName]=myModel.addConstr(myGames[a,'WAS',s,7] ;
-constrName='Home_Before_Int_Week10'                  
-                 myConstr[constrName]=myModel.addConstr(myGames[a,'HOU',s,10] ;
-                 myConstr[constrName]=myModel.addConstr(myGames[a,'OAK',s,10] ;
-               
+constrName='Home_Before_Int_Week3_JAC' 
+myConstr[constrName]= myModel.addConstr(quicksum (myGames[a,'JAC',s,3] for a in H['JAC'] for s in S[3]) == 1, name=constrName )
+constrName='Home_Before_Int_Week3_IND'
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'IND',s,3] for a in H['IND'] for s in S[3] ) == 1, name=constrName )
+
+constrName='Home_Before_Int_Week6_LAR'                
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'LAR',s,6] for a in H['LAR'] for s in S[6] )== 1, name=constrName )
+constrName='Home_Before_Int_Week6_NYG' 
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'NYG',s,6] for a in H['NYG'] for s in S[6] ) == 1, name=constrName )
+
+
+constrName='Home_Before_Int_Week7_CIN' 
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'CIN',s,7] for a in H['CIN'] for s in S[7] ) == 1, name=constrName )
+constrName='Home_Before_Int_Week7_WAS' 
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'WAS',s,7] for a in H['WAS'] for s in S[7]) == 1, name=constrName )
+ 
+constrName='Home_Before_Int_Week10_HOU'                  
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'HOU',s,10] for a in H['HOU'] for s in S[10]) == 1, name=constrName )                 
+constrName='Home_Before_Int_Week10_OAK'
+myConstr[constrName]=myModel.addConstr(quicksum (myGames[a,'OAK',s,10] for a in H['OAK'] for s in S[10] ) == 1, name=constrName )                 
+        
                 
                 
 #Constraint 29: Teams playing an international game will have their BYE game the week following the international game
@@ -396,6 +405,33 @@ for h in T:
             if this_week_slots =='SUNI_NFL':
                 constrName='Bye_After_Int'
                 myConstr[constrName]=myModel.addConstr(quicksum(myGames[a,h,s,w+1] for a in H[h] for s in S[w] if s == 'SUNB_NFL' )  == 1 , name=constrName)
+
+
+constrName='BYE_After_Int_Week6_JAC' 
+myConstr[constrName]= myModel.addConstr(myGames['BYE','JAC','SUNB_NFL',6]   == 1, name=constrName )
+constrName='BYE_After_Int_Week6_IND'
+myConstr[constrName]=myModel.addConstr(myGames['BYE','IND','SUNB_NFL',6]   == 1, name=constrName )
+
+
+constrName='BYE_After_Int_Week8_LAR'                
+myConstr[constrName]=myModel.addConstr(myGames['BYE','LAR','SUNB_NFL',8] == 1, name=constrName )
+constrName='BYE_After_Int_Week8_NYG' 
+myConstr[constrName]=myModel.addConstr(myGames['BYE','NYG','SUNB_NFL',8] == 1, name=constrName )
+
+constrName='BYE_After_Int_Week9_CIN' 
+myConstr[constrName]=myModel.addConstr(myGames['BYE','CIN','SUNB_NFL',9]  == 1, name=constrName )
+constrName='BYE_After_Int_Week9_WAS' 
+myConstr[constrName]=myModel.addConstr(myGames['BYE','WAS','SUNB_NFL',9]  == 1, name=constrName )
+ 
+constrName='Home_Before_Int_Week12_HOU'                  
+myConstr[constrName]=myModel.addConstr(myGames['BYE','HOU','SUNB_NFL',12] == 1, name=constrName )                 
+constrName='Home_Before_Int_Week12_OAK'
+myConstr[constrName]=myModel.addConstr(myGames['BYE','OAK','SUNB_NFL',12] == 1, name=constrName )                 
+   
+
+#Constraint 30 
+
+
 
 
 
@@ -412,6 +448,11 @@ for h in T:
     quicksum (link31 [h,a,w] for h in A[h] for w in range (5,13)) <= 2
 
 myModel.update ()    
+
+
+
+
+
 
 #constraint 34: every team must play exactly once short week during the season
 link34 = {}
