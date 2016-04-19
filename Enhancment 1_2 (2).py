@@ -415,18 +415,20 @@ myModel.update ()
 
 #constraint 34: every team must play exactly once short week during the season
 link34 = {}
-weeks = range(2,17).remove(13)
+weeks = range(2,17)
+weeks.remove (13)
 for h in T:
     for w in weeks:
         link34[h,w]=myModel.addVar(obj=0,vtype=GRB.BINARY,name='link34_%s_%s' %(h,w))
         myModel.update()
-        quicksum(myGames[a,h,s,w-1] for a in H[h] for s in S[w-1] if s.startswith('SUN')) + 
+        constrName='SOFT 34'
+        myConstr[constrName]=myModel.addConstr (quicksum(myGames[a,h,s,w-1] for a in H[h] for s in S[w-1] if s.startswith('SUN'))  + 
         quicksum(myGames[a,h,s,w-1] for h in A[a] for s in S[w-1] if s.startswith('SUN')) +
-        quicksum(myGames[a,h,s,w] for a in H[h] for s in S[w-1] if s.startswith('THU')) + 
-        quicksum(myGames[a,h,s,w] for h in A[a] for s in S[w] if s.startswith('THU')) <= 1 + link34[h,w]
-    
-    quicksum(link34[h,w] for w in weeks) == 1
-    
+        quicksum(myGames[a,h,s,w-1] for a in H[h] for s in S[w-1] if s.startswith('THU')) + 
+        quicksum(myGames[a,h,s,w] for h in A[a] for s in S[w] if s.startswith('THU')) <= 1 + link34[h,w] , name=constrName)
+    constrName='Link 34'
+    myConstr[constrName]=myModel.addConstr(quicksum(link34[h,w] for w in weeks) == 1 , name = constrName )
+     
    
 #myModel.optimize()
 #name="NFL_HW1"
@@ -442,17 +444,3 @@ for h in T:
 '''
 JUNK SPACE
 ''''
-link34 = {}
-weeks = range(2,17).remove(13)
-for h in T:
-    for w in weeks:
-        link34[h,w]=myModel.addVar(obj=0,vtype=GRB.BINARY,name='link34_%s_%s' %(h,w))
-        myModel.update()
-        constrName='SOFT 34'
-        myConstr[constrName]=myModel.addConstr (quicksum(myGames[a,h,s,w-1] for a in H[h] for s in S[w-1] if s.startswith('SUN'))  + 
-        quicksum(myGames[a,h,s,w-1] for h in A[a] for s in S[w-1] if s.startswith('SUN')) +
-        quicksum(myGames[a,h,s,w] for a in H[h] for s in S[w-1] if s.startswith('THU')) + 
-        quicksum(myGames[a,h,s,w] for h in A[a] for s in S[w] if s.startswith('THU')) <= 1 + link34[h,w] , name=constrName)
-    
-    quicksum(link34[h,w] for w in weeks) == 1
-     
